@@ -1,0 +1,72 @@
+{
+  "name": "@llmbase/mcp-shared",
+  "version": "1.0.0",
+  "description": "Shared utilities and types for LLM Base MCP servers",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js",
+      "default": "./dist/types.js"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "import": "./dist/utils/index.js",
+      "default": "./dist/utils/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "shared",
+    "utilities",
+    "types",
+    "typescript"
+  ],
+  "author": {
+    "name": "LLM Base",
+    "url": "https://mcp.llmbase.ai"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/llmbaseai/mcp-servers.git",
+    "directory": "packages/shared"
+  },
+  "bugs": {
+    "url": "https://github.com/llmbaseai/mcp-servers/issues"
+  },
+  "homepage": "https://mcp.llmbase.ai",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "dependencies": {
+    "@cloudflare/workers-types": "^4.20241218.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

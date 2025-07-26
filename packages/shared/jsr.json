@@ -1,0 +1,19 @@
+{
+  "name": "@llmbase/mcp-shared",
+  "version": "1.0.0",
+  "description": "Shared utilities and types for LLM Base MCP servers",
+  "license": "MIT",
+  "repository": "https://github.com/llmbaseai/mcp-servers",
+  "exports": {
+    ".": "./src/index.ts",
+    "./types": "./src/types.ts",
+    "./utils": "./src/utils/index.ts"
+  },
+  "publish": {
+    "include": [
+      "src/**/*.ts",
+      "README.md",
+      "LICENSE"
+    ]
+  }
+}

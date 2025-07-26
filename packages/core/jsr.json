@@ -1,0 +1,20 @@
+{
+  "name": "@llmbase/mcp-core",
+  "version": "1.0.0",
+  "description": "Core functionality for LLM Base MCP servers",
+  "license": "MIT",
+  "repository": "https://github.com/llmbaseai/mcp-servers",
+  "exports": {
+    ".": "./src/index.ts",
+    "./base": "./src/base-server.ts",
+    "./sse": "./src/sse-service.ts",
+    "./registry": "./src/registry.ts"
+  },
+  "publish": {
+    "include": [
+      "src/**/*.ts",
+      "README.md",
+      "LICENSE"
+    ]
+  }
+}

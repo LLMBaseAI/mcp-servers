@@ -1,0 +1,77 @@
+{
+  "name": "@llmbase/mcp-web-fetch",
+  "version": "1.0.0",
+  "description": "MCP server for web content fetching and processing",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "mcp-web-fetch": "dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./cli": {
+      "types": "./dist/cli.d.ts",
+      "import": "./dist/cli.js",
+      "default": "./dist/cli.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "web-fetch",
+    "html-processing",
+    "cloudflare-workers",
+    "typescript"
+  ],
+  "author": {
+    "name": "LLM Base",
+    "url": "https://mcp.llmbase.ai"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/llmbaseai/mcp-servers.git",
+    "directory": "servers/web-fetch"
+  },
+  "bugs": {
+    "url": "https://github.com/llmbaseai/mcp-servers/issues"
+  },
+  "homepage": "https://mcp.llmbase.ai",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "dependencies": {
+    "@cloudflare/workers-types": "^4.20241218.0",
+    "@llmbase/mcp-core": "workspace:*",
+    "@llmbase/mcp-shared": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.16.0",
+    "turndown": "^7.2.0",
+    "workers-mcp": "^0.0.13"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.15",
+    "@types/turndown": "^5.0.5",
+    "typescript": "^5.7.2"
+  }
+}

@@ -1,0 +1,44 @@
+# Self-hosted Cloudflare Workers deployment configuration
+# Copy this file to wrangler.toml and customize for your deployment
+
+name = "your-mcp-servers"  # Change this to your preferred worker name
+compatibility_date = "2024-12-18"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "production"
+# Add your own environment variables here
+
+# No secrets required for basic functionality
+# Add your own secrets here if needed
+# [secrets]
+# MY_API_KEY = "your-api-key"
+
+# Optional: Configure custom domain
+# routes = [
+#   { pattern = "your-domain.com/*", custom_domain = true }
+# ]
+
+# Optional: Configure KV storage for caching
+# kv_namespaces = [
+#   { binding = "MCP_CACHE", id = "your-kv-namespace-id" }
+# ]
+
+# Optional: Configure R2 storage for files
+# r2_buckets = [
+#   { binding = "FILES", bucket_name = "your-r2-bucket" }
+# ]
+
+# Development configuration
+[env.development]
+name = "your-mcp-servers-dev"
+
+[env.development.vars]
+ENVIRONMENT = "development"
+
+# Staging configuration  
+[env.staging]
+name = "your-mcp-servers-staging"
+
+[env.staging.vars]
+ENVIRONMENT = "staging"

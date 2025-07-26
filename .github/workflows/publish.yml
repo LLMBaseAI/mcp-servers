@@ -1,0 +1,128 @@
+name: Publish Packages
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      package:
+        description: 'Package to publish (all, shared, core, web-fetcher)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - shared
+          - core
+          - web-fetcher
+
+permissions:
+  contents: read
+  id-token: write # Required for JSR publishing
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all packages
+        run: pnpm run build --recursive
+
+      - name: Run tests (if any)
+        run: pnpm test --recursive --if-present
+
+  publish-npm:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    strategy:
+      matrix:
+        package: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.package == 'all' && fromJson('["shared", "core", "web-fetcher"]') || github.event_name == 'workflow_dispatch' && fromJson(format('["{0}"]', github.event.inputs.package)) || fromJson('["shared", "core", "web-fetcher"]') }}
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm run build --recursive
+
+      - name: Publish shared package to npm
+        if: matrix.package == 'shared'
+        working-directory: packages/shared
+        run: pnpm publish --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish core package to npm
+        if: matrix.package == 'core'
+        working-directory: packages/core
+        run: pnpm publish --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish web-fetcher server to npm
+        if: matrix.package == 'web-fetcher'
+        working-directory: servers/web-fetcher
+        run: pnpm publish --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-jsr:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    strategy:
+      matrix:
+        package: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.package == 'all' && fromJson('["shared", "core", "web-fetcher"]') || github.event_name == 'workflow_dispatch' && fromJson(format('["{0}"]', github.event.inputs.package)) || fromJson('["shared", "core", "web-fetcher"]') }}
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Publish shared package to JSR
+        if: matrix.package == 'shared'
+        working-directory: packages/shared
+        run: deno publish --allow-dirty
+
+      - name: Publish core package to JSR
+        if: matrix.package == 'core'
+        working-directory: packages/core
+        run: deno publish --allow-dirty
+
+      - name: Publish web-fetcher server to JSR
+        if: matrix.package == 'web-fetcher'
+        working-directory: servers/web-fetcher
+        run: deno publish --allow-dirty

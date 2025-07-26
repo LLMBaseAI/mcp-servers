@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "local-web-fetch-stdio": {
+      "command": "@llmbase/mcp-web-fetch",
+      "args": []
+    },
+    "local-web-fetch-remote": {
+      "command": "npx",
+      "args": ["mcp-remote", "https://localhost:8787/mcp/web-fetch"]
+    },
+    "production-web-fetch": {
+      "command": "npx", 
+      "args": ["mcp-remote", "https://mcp.llmbase.ai/mcp/web-fetch"]
+    }
+  }
+}

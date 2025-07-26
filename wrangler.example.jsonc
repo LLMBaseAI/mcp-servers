@@ -1,0 +1,45 @@
+{
+  "name": "your-worker-name",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-12-18",
+  "account_id": "your-cloudflare-account-id",
+  "vars": {
+    "ENVIRONMENT": "production"
+  },
+  "routes": [
+    {
+      "pattern": "your-domain.com",
+      "custom_domain": true
+    }
+  ],
+  // Enable Node.js compatibility for Turndown
+  "compatibility_flags": ["nodejs_compat"],
+  
+  // Optional: Add KV namespace for caching
+  // "kv_namespaces": [
+  //   {
+  //     "binding": "MCP_CACHE",
+  //     "id": "your-kv-namespace-id",
+  //     "preview_id": "your-preview-kv-namespace-id"
+  //   }
+  // ],
+  
+  // Optional: Add R2 bucket for file storage
+  // "r2_buckets": [
+  //   {
+  //     "binding": "FILES",
+  //     "bucket_name": "mcp-files"
+  //   }
+  // ],
+  
+  // Configure limits and settings (removed cpu_ms for free plan compatibility)
+  // "limits": {
+  //   "cpu_ms": 30000
+  // },
+  
+  // Development configuration
+  "dev": {
+    "port": 8787,
+    "local_protocol": "https"
+  }
+}

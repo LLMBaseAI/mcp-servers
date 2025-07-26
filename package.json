@@ -1,0 +1,94 @@
+{
+  "name": "@llmbase/mcp-servers",
+  "version": "1.0.0",
+  "description": "Production-ready Model Context Protocol (MCP) servers built with Hono.js and deployed on Cloudflare Workers. Extend Claude's capabilities with web scraping, content fetching, and more.",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "dist",
+    "src",
+    "wrangler.jsonc",
+    "README.md",
+    "ENDPOINTS.md",
+    "CLAUDE.md",
+    "PUBLISHING.md",
+    "CONTRIBUTING.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "build": "bun run build:packages && tsc",
+    "build:packages": "bun run --filter='packages/*' build && bun run --filter='servers/*' build",
+    "lint": "eslint src/**/*.ts",
+    "lint:packages": "bun run --filter='packages/*' lint && bun run --filter='servers/*' lint",
+    "format": "prettier --write src/**/*.ts",
+    "test": "bun test --if-present",
+    "test:packages": "bun run --filter='packages/*' test && bun run --filter='servers/*' test",
+    "clean": "rm -rf dist",
+    "clean:packages": "bun run --filter='packages/*' clean && bun run --filter='servers/*' clean",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "bun run build",
+    "version": "bun run format && bun run lint && bun run build",
+    "postversion": "git push && git push --tags"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/llmbaseai/mcp-servers.git"
+  },
+  "homepage": "https://mcp.llmbase.ai",
+  "bugs": {
+    "url": "https://github.com/llmbaseai/mcp-servers/issues"
+  },
+  "dependencies": {
+    "hono": "^4.6.11",
+    "workers-mcp": "^0.0.13",
+    "@cloudflare/workers-types": "^4.20241218.0",
+    "@llmbase/mcp-shared": "workspace:*",
+    "@llmbase/mcp-core": "workspace:*",
+    "@llmbase/mcp-web-fetch": "workspace:*"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.16.0",
+    "@typescript-eslint/eslint-plugin": "^8.18.2",
+    "@typescript-eslint/parser": "^8.18.2",
+    "eslint": "^9.17.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2",
+    "wrangler": "^3.95.0"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "cloudflare",
+    "workers",
+    "hono",
+    "claude",
+    "web-scraping",
+    "ai",
+    "llm",
+    "anthropic",
+    "serverless",
+    "edge-computing",
+    "typescript"
+  ],
+  "author": {
+    "name": "LLM Base",
+    "url": "https://mcp.llmbase.ai"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "workspaces": [
+    "packages/*",
+    "servers/*"
+  ]
+}
