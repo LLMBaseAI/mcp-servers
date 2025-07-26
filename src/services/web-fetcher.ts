@@ -175,7 +175,7 @@ export class WebFetcher {
     const metaMatches = html.matchAll(/<meta\s+([^>]+)>/gi);
     for (const match of metaMatches) {
       const attrs = match[1];
-      if (!attrs) continue;
+      if (!attrs) {continue;}
       
       const nameMatch = attrs.match(/name=['"]([^'"]+)['"]/i);
       const propertyMatch = attrs.match(/property=['"]([^'"]+)['"]/i);

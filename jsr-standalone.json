@@ -6,19 +6,25 @@
   "repository": "https://github.com/llmbaseai/mcp-servers",
   "exports": {
     ".": "./jsr-mod.ts",
-    "./web-fetch": "./servers/web-fetch/src/standalone.ts"
+    "./web-fetch": "./servers/web-fetch/src/standalone-jsr.ts"
   },
   "publish": {
     "include": [
       "jsr-mod.ts",
-      "servers/web-fetch/src/**/*.ts",
+      "servers/web-fetch/src/standalone-jsr.ts",
+      "servers/web-fetch/src/services/web-fetcher-jsr.ts",
+      "servers/web-fetch/src/utils/html-processor-jsr.ts",
+      "servers/web-fetch/src/types.ts",
       "servers/web-fetch/README.md",
       "README.md",
       "LICENSE"
     ],
     "exclude": [
       "**/*.test.ts",
-      "**/*.spec.ts"
+      "**/*.spec.ts",
+      "packages/**",
+      "src/**",
+      "dist/**"
     ]
   }
 }

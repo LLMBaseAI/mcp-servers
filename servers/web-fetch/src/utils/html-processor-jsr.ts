@@ -1,46 +1,9 @@
-import TurndownService from 'turndown';
+// JSR-compatible HTML processor without external dependencies
 import type { HTMLProcessorOptions } from '../types';
 
 export class HTMLProcessor {
-  private turndownService: TurndownService;
-
-  constructor(_options: HTMLProcessorOptions = {}) {
-    this.turndownService = new TurndownService({
-      headingStyle: 'atx',
-      codeBlockStyle: 'fenced',
-    });
-
-    // Configure turndown rules
-    this.setupTurndownRules();
-  }
-
-  private setupTurndownRules() {
-    // Remove script and style tags completely
-    this.turndownService.remove(['script', 'style', 'noscript']);
-    
-    // Handle navigation elements
-    this.turndownService.addRule('navigation', {
-      filter: ['nav', 'aside'],
-      replacement: () => ''
-    });
-
-    // Handle footer elements
-    this.turndownService.addRule('footer', {
-      filter: 'footer',
-      replacement: (content: string) => content ? `\n\n---\n${content}\n---\n\n` : ''
-    });
-
-    // Handle code blocks better
-    this.turndownService.addRule('preCode', {
-      filter: (node: any) => {
-        return node.nodeName === 'PRE' && node.firstChild?.nodeName === 'CODE';
-      },
-      replacement: (content: string, node: any) => {
-        const codeElement = node.firstChild as any;
-        const language = (codeElement.className || '').match(/language-(\w+)/)?.[1] || '';
-        return `\n\n\`\`\`${language}\n${codeElement.textContent || ''}\n\`\`\`\n\n`;
-      }
-    });
+  constructor(options: HTMLProcessorOptions = {}) {
+    // No external dependencies needed for JSR version
   }
 
   /**
@@ -49,12 +12,12 @@ export class HTMLProcessor {
   async htmlToTextWithRewriter(html: string, options: HTMLProcessorOptions = {}): Promise<string> {
     const rewriter = new HTMLRewriter();
     let textContent = '';
-    let _title = '';
+    let title = '';
     
     // Extract title
     rewriter.on('title', {
       text(text) {
-        _title += text.text;
+        title += text.text;
       }
     });
 
@@ -88,7 +51,7 @@ export class HTMLProcessor {
   }
 
   /**
-   * Convert HTML to markdown using Turndown
+   * Convert HTML to markdown using basic text processing (no external dependencies)
    */
   htmlToMarkdown(html: string, options: HTMLProcessorOptions = {}): string {
     try {
@@ -101,8 +64,57 @@ export class HTMLProcessor {
         cleanHtml = cleanHtml.replace(/<noscript\b[^<]*(?:(?!<\/noscript>)<[^<]*)*<\/noscript>/gi, '');
       }
 
-      // Convert to markdown
-      let markdown = this.turndownService.turndown(cleanHtml);
+      // Basic HTML to Markdown conversion
+      let markdown = cleanHtml;
+      
+      // Headers
+      markdown = markdown.replace(/<h1[^>]*>(.*?)<\/h1>/gi, '# $1\n\n');
+      markdown = markdown.replace(/<h2[^>]*>(.*?)<\/h2>/gi, '## $1\n\n');
+      markdown = markdown.replace(/<h3[^>]*>(.*?)<\/h3>/gi, '### $1\n\n');
+      markdown = markdown.replace(/<h4[^>]*>(.*?)<\/h4>/gi, '#### $1\n\n');
+      markdown = markdown.replace(/<h5[^>]*>(.*?)<\/h5>/gi, '##### $1\n\n');
+      markdown = markdown.replace(/<h6[^>]*>(.*?)<\/h6>/gi, '###### $1\n\n');
+      
+      // Bold and italic
+      markdown = markdown.replace(/<strong[^>]*>(.*?)<\/strong>/gi, '**$1**');
+      markdown = markdown.replace(/<b[^>]*>(.*?)<\/b>/gi, '**$1**');
+      markdown = markdown.replace(/<em[^>]*>(.*?)<\/em>/gi, '*$1*');
+      markdown = markdown.replace(/<i[^>]*>(.*?)<\/i>/gi, '*$1*');
+      
+      // Links
+      markdown = markdown.replace(/<a[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>/gi, '[$2]($1)');
+      
+      // Code
+      markdown = markdown.replace(/<code[^>]*>(.*?)<\/code>/gi, '`$1`');
+      markdown = markdown.replace(/<pre[^>]*>(.*?)<\/pre>/gi, '\n```\n$1\n```\n');
+      
+      // Lists
+      markdown = markdown.replace(/<ul[^>]*>/gi, '\n');
+      markdown = markdown.replace(/<\/ul>/gi, '\n');
+      markdown = markdown.replace(/<ol[^>]*>/gi, '\n');
+      markdown = markdown.replace(/<\/ol>/gi, '\n');
+      markdown = markdown.replace(/<li[^>]*>(.*?)<\/li>/gi, '- $1\n');
+      
+      // Paragraphs and line breaks
+      markdown = markdown.replace(/<p[^>]*>/gi, '\n');
+      markdown = markdown.replace(/<\/p>/gi, '\n\n');
+      markdown = markdown.replace(/<br[^>]*>/gi, '\n');
+      
+      // Images
+      markdown = markdown.replace(/<img[^>]*src="([^"]*)"[^>]*alt="([^"]*)"[^>]*>/gi, '![$2]($1)');
+      markdown = markdown.replace(/<img[^>]*alt="([^"]*)"[^>]*src="([^"]*)"[^>]*>/gi, '![$1]($2)');
+      markdown = markdown.replace(/<img[^>]*src="([^"]*)"[^>]*>/gi, '![]($1)');
+      
+      // Remove remaining HTML tags
+      markdown = markdown.replace(/<[^>]*>/g, '');
+      
+      // Decode HTML entities
+      markdown = markdown.replace(/&nbsp;/g, ' ');
+      markdown = markdown.replace(/&lt;/g, '<');
+      markdown = markdown.replace(/&gt;/g, '>');
+      markdown = markdown.replace(/&amp;/g, '&');
+      markdown = markdown.replace(/&quot;/g, '"');
+      markdown = markdown.replace(/&#39;/g, "'");
       
       // Clean up extra whitespace
       markdown = markdown.replace(/\n\s*\n\s*\n/g, '\n\n');

@@ -12,6 +12,31 @@ export default [
         ecmaVersion: 2022,
         sourceType: 'module',
       },
+      globals: {
+        // Cloudflare Workers globals
+        fetch: 'readonly',
+        Response: 'readonly',
+        Request: 'readonly',
+        URL: 'readonly',
+        URLSearchParams: 'readonly',
+        TextEncoder: 'readonly',
+        TextDecoder: 'readonly',
+        AbortController: 'readonly',
+        ReadableStream: 'readonly',
+        WritableStream: 'readonly',
+        TransformStream: 'readonly',
+        ReadableStreamDefaultController: 'readonly',
+        HTMLRewriter: 'readonly',
+        ExecutionContext: 'readonly',
+        console: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        KVNamespace: 'readonly',
+        R2Bucket: 'readonly',
+        ExportedHandler: 'readonly',
+      },
     },
     plugins: {
       '@typescript-eslint': typescript,
@@ -20,7 +45,6 @@ export default [
       // TypeScript specific rules
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/prefer-const': 'error',
       
       // General rules
       'no-console': 'off', // Allow console statements for server logging

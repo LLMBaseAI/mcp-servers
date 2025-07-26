@@ -1,9 +1,9 @@
-// Standalone version for JSR publishing without workspace dependencies
+// JSR-compatible standalone version without workspace dependencies or external packages
 // This file includes all necessary types and utilities inline
 
 import { WorkerEntrypoint } from 'cloudflare:workers';
 import type { WebFetchOptions, WebFetchResult, WebFetcherEnv } from './types';
-import { WebFetcher } from './services/web-fetcher';
+import { WebFetcher } from './services/web-fetcher-jsr';
 
 // Inline shared types (normally from @llmbase/mcp-shared)
 export interface MCPResponse<T = any> {
@@ -257,7 +257,7 @@ export class WebFetcherMCPServer extends WorkerEntrypoint<WebFetcherEnv> {
   }
 }
 
-// Re-export other utilities
-export { WebFetcher } from './services/web-fetcher';
-export { HTMLProcessor } from './utils/html-processor';
+// Re-export other utilities for JSR compatibility
+export { WebFetcher } from './services/web-fetcher-jsr';
+export { HTMLProcessor } from './utils/html-processor-jsr';
 export type { WebFetchOptions, WebFetchResult, WebFetcherEnv } from './types';

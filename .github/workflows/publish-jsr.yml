@@ -35,5 +35,4 @@ jobs:
       - name: Publish to JSR
         run: |
           # Use standalone config for JSR that doesn't depend on workspace packages
-          cp jsr-standalone.json jsr.json
-          bunx jsr publish
+          bunx jsr publish --config jsr-standalone.json

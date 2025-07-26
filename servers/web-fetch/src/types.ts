@@ -20,6 +20,9 @@ export interface WebFetchResult {
   title?: string;
   statusCode: number;
   finalUrl: string;
+  headers?: Record<string, string>;
+  fetchTime?: number;
+  error?: string;
 }
 
 export interface HTMLProcessorOptions {
@@ -27,4 +30,16 @@ export interface HTMLProcessorOptions {
   removeStyles?: boolean;
   preserveLinks?: boolean;
   baseUrl?: string;
+}
+
+export interface WebsiteMetadata {
+  title?: string;
+  description?: string;
+  keywords?: string;
+  author?: string;
+  robots?: string;
+  canonical?: string;
+  openGraph: Record<string, string>;
+  twitterCard: Record<string, string>;
+  structuredData: any[];
 }
