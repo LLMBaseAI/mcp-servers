@@ -1,0 +1,22 @@
+{
+  "name": "@llmbase/mcp-servers",
+  "version": "1.0.0",
+  "description": "Production-ready Model Context Protocol (MCP) servers built with Hono.js and deployed on Cloudflare Workers. Extend Claude's capabilities with web scraping, content fetching, and more.",
+  "license": "MIT",
+  "repository": "https://github.com/llmbaseai/mcp-servers",
+  "exports": {
+    ".": "./mod.ts",
+    "./web-fetch": "./servers/web-fetch/src/index.ts",
+    "./web-fetch/cli": "./servers/web-fetch/src/cli.ts"
+  },
+  "publish": {
+    "include": [
+      "mod.ts",
+      "servers/web-fetch/src/**/*.ts",
+      "servers/web-fetch/README.md",
+      "packages/*/src/**/*.ts",
+      "README.md",
+      "LICENSE"
+    ]
+  }
+}
