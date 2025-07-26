@@ -41,7 +41,15 @@ jobs:
 
       - name: Type check
         run: |
+          # Build workspace packages first (critical build order)
+          echo "Building workspace packages in order..."
+          cd packages/shared && bunx tsc
+          cd ../core && bunx tsc  
+          cd ../../servers/web-fetch && bunx tsc
+          
           # Build main project
+          echo "Building main project..."
+          cd ../../
           bunx tsc --skipLibCheck
 
       - name: Check dist output
@@ -93,7 +101,15 @@ jobs:
 
       - name: Build package
         run: |
-          # Build just the main project for packaging
+          # Build workspace packages first (required for main project)
+          echo "Building workspace packages in order..."
+          cd packages/shared && bunx tsc
+          cd ../core && bunx tsc  
+          cd ../../servers/web-fetch && bunx tsc
+          
+          # Build main project for packaging
+          echo "Building main project for packaging..."
+          cd ../../
           bunx tsc --project tsconfig.json --skipLibCheck
 
       - name: Pack package
