@@ -20,7 +20,7 @@ export class WebFetcher {
       followRedirects = true,
       timeout = this.defaultTimeout,
       userAgent = this.defaultUserAgent,
-      headers = {}
+      headers = {},
     } = options;
 
     // Validate URL
@@ -35,13 +35,13 @@ export class WebFetcher {
 
       const requestHeaders = {
         'User-Agent': userAgent,
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language': 'en-US,en;q=0.5',
         'Accept-Encoding': 'gzip, deflate',
-        'DNT': '1',
-        'Connection': 'keep-alive',
+        DNT: '1',
+        Connection: 'keep-alive',
         'Upgrade-Insecure-Requests': '1',
-        ...headers
+        ...headers,
       };
 
       const response = await fetch(url, {
@@ -69,7 +69,7 @@ export class WebFetcher {
           contentType,
           url: finalUrl,
           statusCode: response.status,
-          finalUrl
+          finalUrl,
         };
       }
 
@@ -90,7 +90,7 @@ export class WebFetcher {
             removeScripts: true,
             removeStyles: true,
             preserveLinks: true,
-            baseUrl: finalUrl
+            baseUrl: finalUrl,
           });
           break;
       }
@@ -101,9 +101,8 @@ export class WebFetcher {
         url: finalUrl,
         title,
         statusCode: response.status,
-        finalUrl
+        finalUrl,
       };
-
     } catch (error) {
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
@@ -118,15 +117,21 @@ export class WebFetcher {
   /**
    * Fetch multiple websites concurrently
    */
-  async fetchMultiple(urls: string[], options: Omit<WebFetchOptions, 'url'> = {}): Promise<WebFetchResult[]> {
-    const fetchPromises = urls.map(url => 
-      this.fetchWebsite({ ...options, url }).catch(error => ({
-        content: '',
-        contentType: 'text/plain',
-        url,
-        statusCode: 0,
-        error: error.message
-      } as WebFetchResult & { error: string }))
+  async fetchMultiple(
+    urls: string[],
+    options: Omit<WebFetchOptions, 'url'> = {}
+  ): Promise<WebFetchResult[]> {
+    const fetchPromises = urls.map((url) =>
+      this.fetchWebsite({ ...options, url }).catch(
+        (error) =>
+          ({
+            content: '',
+            contentType: 'text/plain',
+            url,
+            statusCode: 0,
+            error: error.message,
+          }) as WebFetchResult & { error: string }
+      )
     );
 
     return Promise.all(fetchPromises);
@@ -138,7 +143,7 @@ export class WebFetcher {
   private isValidUrl(url: string): boolean {
     try {
       const parsedUrl = new URL(url);
-      
+
       // Only allow HTTP and HTTPS
       if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
         return false;
@@ -175,8 +180,10 @@ export class WebFetcher {
     const metaMatches = html.matchAll(/<meta\s+([^>]+)>/gi);
     for (const match of metaMatches) {
       const attrs = match[1];
-      if (!attrs) {continue;}
-      
+      if (!attrs) {
+        continue;
+      }
+
       const nameMatch = attrs.match(/name=['"]([^'"]+)['"]/i);
       const propertyMatch = attrs.match(/property=['"]([^'"]+)['"]/i);
       const contentMatch = attrs.match(/content=['"]([^'"]*)['"]/i);

@@ -1,4 +1,3 @@
-
 export interface SSEMessage {
   id?: string;
   event?: string;
@@ -9,25 +8,25 @@ export interface SSEMessage {
 export class SSEService {
   private static formatMessage(message: SSEMessage): string {
     let formatted = '';
-    
+
     if (message.id) {
       formatted += `id: ${message.id}\n`;
     }
-    
+
     if (message.event) {
       formatted += `event: ${message.event}\n`;
     }
-    
+
     if (message.retry) {
       formatted += `retry: ${message.retry}\n`;
     }
-    
+
     // Handle multi-line data
     const lines = message.data.split('\n');
     for (const line of lines) {
       formatted += `data: ${line}\n`;
     }
-    
+
     formatted += '\n';
     return formatted;
   }
@@ -43,24 +42,24 @@ export class SSEService {
             type: 'connection',
             sessionId: sessionId || generateSessionId(),
             timestamp: new Date().toISOString(),
-            message: 'MCP SSE stream established'
-          })
+            message: 'MCP SSE stream established',
+          }),
         };
-        
+
         controller.enqueue(new TextEncoder().encode(SSEService.formatMessage(welcome)));
       },
-      
+
       cancel() {
         // Cleanup when client disconnects
         console.log('SSE stream cancelled');
-      }
+      },
     });
 
     return new Response(stream, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
+        Connection: 'keep-alive',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -73,11 +72,9 @@ export class SSEService {
     controller.enqueue(new TextEncoder().encode(formatted));
   }
 
-  static createProgressStream(
-    operation: () => AsyncGenerator<unknown, void, unknown>
-  ): Response {
+  static createProgressStream(operation: () => AsyncGenerator<unknown, void, unknown>): Response {
     let messageId = 1;
-    
+
     const stream = new ReadableStream({
       async start(controller) {
         try {
@@ -87,8 +84,8 @@ export class SSEService {
             event: 'start',
             data: JSON.stringify({
               type: 'operation_start',
-              timestamp: new Date().toISOString()
-            })
+              timestamp: new Date().toISOString(),
+            }),
           });
 
           // Stream progress updates
@@ -96,7 +93,7 @@ export class SSEService {
             SSEService.sendSSEMessage(controller, {
               id: (messageId++).toString(),
               event: 'progress',
-              data: JSON.stringify(progress)
+              data: JSON.stringify(progress),
             });
           }
 
@@ -106,10 +103,9 @@ export class SSEService {
             event: 'complete',
             data: JSON.stringify({
               type: 'operation_complete',
-              timestamp: new Date().toISOString()
-            })
+              timestamp: new Date().toISOString(),
+            }),
           });
-
         } catch (error) {
           // Send error message
           SSEService.sendSSEMessage(controller, {
@@ -118,20 +114,20 @@ export class SSEService {
             data: JSON.stringify({
               type: 'error',
               error: error instanceof Error ? error.message : 'Unknown error',
-              timestamp: new Date().toISOString()
-            })
+              timestamp: new Date().toISOString(),
+            }),
           });
         } finally {
           controller.close();
         }
-      }
+      },
     });
 
     return new Response(stream, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
+        Connection: 'keep-alive',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -176,23 +172,23 @@ export class MCPSSEHandler {
             protocolVersion: '2024-11-05',
             capabilities: {
               tools: {},
-              resources: {}
+              resources: {},
             },
             serverInfo: {
               name: '@llmbase/mcp-servers',
-              version: '1.0.0'
+              version: '1.0.0',
             },
-            sessionId: this.sessionId
-          }
+            sessionId: this.sessionId,
+          },
         });
-      }
+      },
     });
 
     return new Response(stream, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
+        Connection: 'keep-alive',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -200,33 +196,44 @@ export class MCPSSEHandler {
     });
   }
 
-  private sendMCPMessage(controller: ReadableStreamDefaultController, message: MCPSSEMessage): void {
+  private sendMCPMessage(
+    controller: ReadableStreamDefaultController,
+    message: MCPSSEMessage
+  ): void {
     const sseMessage: SSEMessage = {
       id: (this.messageId++).toString(),
       event: message.method ? 'notification' : 'response',
-      data: JSON.stringify(message)
+      data: JSON.stringify(message),
     };
 
     SSEService.sendSSEMessage(controller, sseMessage);
   }
 
-  sendToolResponse(controller: ReadableStreamDefaultController, id: string | number, result: unknown): void {
+  sendToolResponse(
+    controller: ReadableStreamDefaultController,
+    id: string | number,
+    result: unknown
+  ): void {
     this.sendMCPMessage(controller, {
       jsonrpc: '2.0',
       id,
-      result
+      result,
     });
   }
 
-  sendError(controller: ReadableStreamDefaultController, id: string | number, error: Error | { message: string }): void {
+  sendError(
+    controller: ReadableStreamDefaultController,
+    id: string | number,
+    error: Error | { message: string }
+  ): void {
     this.sendMCPMessage(controller, {
       jsonrpc: '2.0',
       id,
       error: {
         code: -1,
         message: error.message || 'Unknown error',
-        data: error
-      }
+        data: error,
+      },
     });
   }
 }

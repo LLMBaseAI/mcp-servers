@@ -17,17 +17,17 @@ export class HTMLProcessor {
   private setupTurndownRules() {
     // Remove script and style tags completely
     this.turndownService.remove(['script', 'style', 'noscript']);
-    
+
     // Handle navigation elements
     this.turndownService.addRule('navigation', {
       filter: ['nav', 'aside'],
-      replacement: () => ''
+      replacement: () => '',
     });
 
     // Handle footer elements
     this.turndownService.addRule('footer', {
       filter: 'footer',
-      replacement: (content: string) => content ? `\n\n---\n${content}\n---\n\n` : ''
+      replacement: (content: string) => (content ? `\n\n---\n${content}\n---\n\n` : ''),
     });
 
     // Handle code blocks better
@@ -35,11 +35,14 @@ export class HTMLProcessor {
       filter: (node: { nodeName: string; firstChild?: { nodeName: string } }) => {
         return node.nodeName === 'PRE' && node.firstChild?.nodeName === 'CODE';
       },
-      replacement: (content: string, node: { firstChild?: { className?: string; textContent?: string } }) => {
+      replacement: (
+        content: string,
+        node: { firstChild?: { className?: string; textContent?: string } }
+      ) => {
         const codeElement = node.firstChild;
         const language = (codeElement?.className || '').match(/language-(\w+)/)?.[1] || '';
         return `\n\n\`\`\`${language}\n${codeElement?.textContent || ''}\n\`\`\`\n\n`;
-      }
+      },
     });
   }
 
@@ -49,26 +52,38 @@ export class HTMLProcessor {
   async htmlToTextWithRewriter(html: string, options: HTMLProcessorOptions = {}): Promise<string> {
     const rewriter = new HTMLRewriter();
     let textContent = '';
-    
+
     // Extract title (if needed for future use)
     rewriter.on('title', {
       text(_text) {
         // Title extraction logic could be added here if needed
-      }
+      },
     });
 
     // Remove unwanted elements
     if (options.removeScripts !== false) {
-      rewriter.on('script', { element: (el) => { el.remove(); } });
-      rewriter.on('style', { element: (el) => { el.remove(); } });
-      rewriter.on('noscript', { element: (el) => { el.remove(); } });
+      rewriter.on('script', {
+        element: (el) => {
+          el.remove();
+        },
+      });
+      rewriter.on('style', {
+        element: (el) => {
+          el.remove();
+        },
+      });
+      rewriter.on('noscript', {
+        element: (el) => {
+          el.remove();
+        },
+      });
     }
 
     // Extract text content from body
     rewriter.on('body', {
       text(text) {
         textContent += text.text;
-      }
+      },
     });
 
     // If no body, extract from any text
@@ -77,7 +92,7 @@ export class HTMLProcessor {
         if (!textContent) {
           textContent += text.text;
         }
-      }
+      },
     });
 
     const response = new Response(html);
@@ -93,20 +108,23 @@ export class HTMLProcessor {
     try {
       // Pre-process HTML to clean it up
       let cleanHtml = html;
-      
+
       if (options.removeScripts !== false) {
         cleanHtml = cleanHtml.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
         cleanHtml = cleanHtml.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
-        cleanHtml = cleanHtml.replace(/<noscript\b[^<]*(?:(?!<\/noscript>)<[^<]*)*<\/noscript>/gi, '');
+        cleanHtml = cleanHtml.replace(
+          /<noscript\b[^<]*(?:(?!<\/noscript>)<[^<]*)*<\/noscript>/gi,
+          ''
+        );
       }
 
       // Convert to markdown
       let markdown = this.turndownService.turndown(cleanHtml);
-      
+
       // Clean up extra whitespace
       markdown = markdown.replace(/\n\s*\n\s*\n/g, '\n\n');
       markdown = markdown.replace(/^\s+|\s+$/g, '');
-      
+
       return markdown;
     } catch (error) {
       console.error('Error converting HTML to markdown:', error);

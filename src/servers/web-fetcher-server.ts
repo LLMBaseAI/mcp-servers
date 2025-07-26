@@ -12,7 +12,7 @@ export class WebFetcherMCPServer extends WorkerEntrypoint<Env> {
 
   /**
    * Fetch a website and return its content as raw text, markdown, or plain text.
-   * 
+   *
    * @param url The URL to fetch
    * @param format The format to return the content in ('raw', 'markdown', 'text')
    * @param followRedirects Whether to follow HTTP redirects
@@ -35,12 +35,12 @@ export class WebFetcherMCPServer extends WorkerEntrypoint<Env> {
       followRedirects,
       timeout,
       userAgent,
-      headers
+      headers,
     };
 
     try {
       const result = await this.webFetcher.fetchWebsite(options);
-      
+
       return {
         success: true,
         data: {
@@ -51,21 +51,21 @@ export class WebFetcherMCPServer extends WorkerEntrypoint<Env> {
           contentType: result.contentType,
           statusCode: result.statusCode,
           format,
-          fetchedAt: new Date().toISOString()
-        }
+          fetchedAt: new Date().toISOString(),
+        },
       };
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error occurred',
-        url
+        url,
       };
     }
   }
 
   /**
    * Fetch multiple websites concurrently.
-   * 
+   *
    * @param urls Array of URLs to fetch
    * @param format The format to return the content in
    * @param maxConcurrent Maximum number of concurrent requests (default: 5)
@@ -83,14 +83,14 @@ export class WebFetcherMCPServer extends WorkerEntrypoint<Env> {
     if (urls.length === 0) {
       return {
         success: false,
-        error: 'No URLs provided'
+        error: 'No URLs provided',
       };
     }
 
     if (urls.length > 20) {
       return {
         success: false,
-        error: 'Too many URLs. Maximum 20 URLs allowed per request.'
+        error: 'Too many URLs. Maximum 20 URLs allowed per request.',
       };
     }
 
@@ -102,7 +102,7 @@ export class WebFetcherMCPServer extends WorkerEntrypoint<Env> {
         const batchResults = await this.webFetcher.fetchMultiple(batch, {
           format,
           followRedirects,
-          timeout
+          timeout,
         });
         results.push(...batchResults);
       }
@@ -117,25 +117,25 @@ export class WebFetcherMCPServer extends WorkerEntrypoint<Env> {
           finalUrl: result.finalUrl,
           contentType: result.contentType,
           statusCode: result.statusCode,
-          error: (result as WebFetchResult & { error?: string }).error || null
+          error: (result as WebFetchResult & { error?: string }).error || null,
         })),
         summary: {
           totalRequested: urls.length,
-          successful: results.filter(r => r.statusCode >= 200 && r.statusCode < 400).length,
-          failed: results.filter(r => r.statusCode < 200 || r.statusCode >= 400).length
-        }
+          successful: results.filter((r) => r.statusCode >= 200 && r.statusCode < 400).length,
+          failed: results.filter((r) => r.statusCode < 200 || r.statusCode >= 400).length,
+        },
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error occurred'
+        error: error instanceof Error ? error.message : 'Unknown error occurred',
       };
     }
   }
 
   /**
    * Extract metadata from a website without downloading the full content.
-   * 
+   *
    * @param url The URL to analyze
    * @returns Website metadata including title, description, and other meta tags
    */
@@ -144,7 +144,7 @@ export class WebFetcherMCPServer extends WorkerEntrypoint<Env> {
       const result = await this.webFetcher.fetchWebsite({
         url,
         format: 'raw',
-        timeout: 15000
+        timeout: 15000,
       });
 
       const metadata = await this.webFetcher.extractMetadata(result.content);
@@ -158,21 +158,21 @@ export class WebFetcherMCPServer extends WorkerEntrypoint<Env> {
           statusCode: result.statusCode,
           contentType: result.contentType,
           metadata,
-          fetchedAt: new Date().toISOString()
-        }
+          fetchedAt: new Date().toISOString(),
+        },
       };
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error occurred',
-        url
+        url,
       };
     }
   }
 
   /**
    * Check if a URL is accessible without downloading the content.
-   * 
+   *
    * @param url The URL to check
    * @returns Status information about the URL
    */
@@ -181,9 +181,9 @@ export class WebFetcherMCPServer extends WorkerEntrypoint<Env> {
       const response = await fetch(url, {
         method: 'HEAD',
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; CloudflareWorker-MCP/1.0)'
+          'User-Agent': 'Mozilla/5.0 (compatible; CloudflareWorker-MCP/1.0)',
         },
-        redirect: 'follow'
+        redirect: 'follow',
       });
 
       return {
@@ -198,14 +198,14 @@ export class WebFetcherMCPServer extends WorkerEntrypoint<Env> {
           lastModified: response.headers.get('last-modified'),
           server: response.headers.get('server'),
           accessible: response.ok,
-          checkedAt: new Date().toISOString()
-        }
+          checkedAt: new Date().toISOString(),
+        },
       };
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error occurred',
-        url
+        url,
       };
     }
   }
