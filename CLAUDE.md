@@ -86,7 +86,7 @@ bun install
 # Development server
 bun run dev
 
-# Build TypeScript
+# Build TypeScript (builds workspace packages first)
 bun run build
 
 # Deploy to Cloudflare Workers
@@ -98,6 +98,75 @@ bun run lint
 # Format code
 bun run format
 ```
+
+### Deployment Methods
+
+This project supports **four different deployment methods**, each with its own configuration:
+
+#### 1. NPM Package (`@llmbase/mcp-servers`)
+- **File**: `package.json` (main workspace package)
+- **Build**: Requires workspace packages to be built first
+- **Usage**: `npm install @llmbase/mcp-servers`
+- **Dependencies**: Uses workspace packages (`@llmbase/mcp-shared`, `@llmbase/mcp-core`, etc.)
+
+#### 2. JSR Package (`@llmbase/mcp-servers`)  
+- **File**: `jsr-standalone.json` (JSR-specific configuration)
+- **Build**: Uses standalone files without external dependencies
+- **Usage**: `deno add @llmbase/mcp-servers`
+- **Key Files**:
+  - `jsr-mod.ts` - Entry point
+  - `servers/web-fetch/src/standalone-jsr.ts` - JSR-compatible standalone
+  - `servers/web-fetch/src/services/web-fetcher-jsr.ts` - No external deps
+  - `servers/web-fetch/src/utils/html-processor-jsr.ts` - No Turndown dependency
+
+#### 3. Self-hosted Deployment
+- **Files**: `templates/` directory with example configurations
+- **Dependencies**: Uses published npm packages
+- **Usage**: Copy templates and deploy to your own Cloudflare Workers
+
+#### 4. Hosted Service (`https://mcp.llmbase.ai`)
+- **Production URL**: `https://mcp.llmbase.ai`
+- **Configuration**: `wrangler.jsonc` (excluded from git for security)
+- **Usage**: Direct MCP client connection to hosted service
+
+### Build Process & Dependencies
+
+#### Critical Build Order:
+```bash
+# 1. Build workspace packages first
+cd packages/shared && bunx tsc
+cd packages/core && bunx tsc  
+cd servers/web-fetch && bunx tsc
+
+# 2. Then build main project
+bunx tsc --skipLibCheck
+```
+
+#### JSR Publishing Process:
+```bash
+# Test JSR publishing (dry run)
+bunx jsr publish --config jsr-standalone.json --dry-run --allow-dirty
+
+# Actual JSR publishing (in CI)
+bunx jsr publish --config jsr-standalone.json
+```
+
+### Important Technical Notes
+
+#### JSR Compatibility Issues:
+- **External Dependencies**: JSR doesn't support external npm packages like `turndown`
+- **Workspace References**: JSR packages can't reference workspace packages
+- **Solution**: Created JSR-specific standalone files with inlined dependencies
+
+#### Import Path Requirements:
+- **TypeScript Files**: Remove `.ts` extensions from imports for JSR compatibility
+- **Workspace Packages**: Must be built before main project compilation
+- **ES Modules**: All packages use `"type": "module"` for modern ES module support
+
+#### Security Considerations:
+- **wrangler.jsonc**: Contains sensitive account IDs, excluded from git
+- **wrangler.example.jsonc**: Template without sensitive data for public repository
+- **Environment Variables**: Use Cloudflare Workers secrets for sensitive config
 
 ### Configuration Files
 
@@ -261,9 +330,22 @@ Use Claude Desktop with this configuration:
 ### Troubleshooting Common Issues
 
 #### Build Errors
-- Check TypeScript version compatibility
-- Ensure all dependencies are properly installed
-- Verify `@types/turndown` is in devDependencies
+- **Missing workspace dependencies**: Build packages in order (`packages/shared` → `packages/core` → `servers/web-fetch` → main)
+- **TypeScript compilation errors**: Use `bunx tsc --skipLibCheck` for initial builds
+- **Import path errors**: Remove `.ts` extensions from imports in JSR-compatible files
+- **Missing type definitions**: Ensure all workspace packages are built before main project
+
+#### JSR Publishing Errors
+- **Excluded modules error**: Check `jsr-standalone.json` includes all required files
+- **External dependency error**: Use JSR-compatible standalone files without npm packages
+- **Import path error**: Ensure no `.ts` extensions in JSR files
+- **Workspace reference error**: JSR packages must be self-contained, no workspace deps
+
+#### GitHub Actions Failures
+- **Missing build artifacts**: Ensure workspace packages are built before main build
+- **ESLint errors**: Update ESLint config with Cloudflare Workers globals
+- **JSR publishing auth**: Uses OIDC authentication, no manual tokens required
+- **Build script errors**: Use `bunx tsc` instead of `npx tsc` for Bun compatibility
 
 #### Runtime Errors
 - Check environment configuration in wrangler.jsonc
@@ -274,6 +356,12 @@ Use Claude Desktop with this configuration:
 - Verify workers-mcp version compatibility
 - Check Claude Desktop configuration syntax
 - Test SSE endpoints with browser or curl
+
+#### Deployment Method Troubleshooting
+- **NPM**: Ensure all workspace dependencies are built and published
+- **JSR**: Use `jsr-standalone.json` config with standalone files
+- **Self-hosted**: Copy templates and update with your Cloudflare account details
+- **Hosted**: Production service at `mcp.llmbase.ai` should be operational
 
 ### Code Style & Standards
 
