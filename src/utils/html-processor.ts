@@ -32,13 +32,13 @@ export class HTMLProcessor {
 
     // Handle code blocks better
     this.turndownService.addRule('preCode', {
-      filter: (node: any) => {
+      filter: (node: { nodeName: string; firstChild?: { nodeName: string } }) => {
         return node.nodeName === 'PRE' && node.firstChild?.nodeName === 'CODE';
       },
-      replacement: (content: string, node: any) => {
-        const codeElement = node.firstChild as any;
-        const language = (codeElement.className || '').match(/language-(\w+)/)?.[1] || '';
-        return `\n\n\`\`\`${language}\n${codeElement.textContent || ''}\n\`\`\`\n\n`;
+      replacement: (content: string, node: { firstChild?: { className?: string; textContent?: string } }) => {
+        const codeElement = node.firstChild;
+        const language = (codeElement?.className || '').match(/language-(\w+)/)?.[1] || '';
+        return `\n\n\`\`\`${language}\n${codeElement?.textContent || ''}\n\`\`\`\n\n`;
       }
     });
   }
@@ -49,12 +49,11 @@ export class HTMLProcessor {
   async htmlToTextWithRewriter(html: string, options: HTMLProcessorOptions = {}): Promise<string> {
     const rewriter = new HTMLRewriter();
     let textContent = '';
-    let _title = '';
     
-    // Extract title
+    // Extract title (if needed for future use)
     rewriter.on('title', {
-      text(text) {
-        _title += text.text;
+      text(_text) {
+        // Title extraction logic could be added here if needed
       }
     });
 

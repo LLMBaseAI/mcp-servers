@@ -1,8 +1,8 @@
 import { createRouter } from './router';
-import type { BaseEnv } from '@llmbase/mcp-shared';
+import type { Env } from './types';
 
 // Main application environment (extending base for main worker app)
-interface MainAppEnv extends BaseEnv {
+interface MainAppEnv extends Env {
   // Add any main app specific environment variables here
 }
 
@@ -17,5 +17,5 @@ export default {
 } satisfies ExportedHandler<MainAppEnv>;
 
 // Export the MCP servers for direct use if needed
-export { WebFetcherMCPServer } from '../servers/web-fetch/src/index.js';
+export { WebFetcherMCPServer } from './servers/web-fetcher-server';
 export type { MainAppEnv };

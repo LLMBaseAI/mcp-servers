@@ -1,4 +1,3 @@
-import type { Env } from '../types';
 
 export interface SSEMessage {
   id?: string;
@@ -75,7 +74,7 @@ export class SSEService {
   }
 
   static createProgressStream(
-    operation: () => AsyncGenerator<any, any, unknown>
+    operation: () => AsyncGenerator<unknown, void, unknown>
   ): Response {
     let messageId = 1;
     
@@ -149,12 +148,12 @@ export interface MCPSSEMessage {
   jsonrpc: '2.0';
   id?: string | number;
   method?: string;
-  params?: any;
-  result?: any;
+  params?: unknown;
+  result?: unknown;
   error?: {
     code: number;
     message: string;
-    data?: any;
+    data?: unknown;
   };
 }
 
@@ -211,7 +210,7 @@ export class MCPSSEHandler {
     SSEService.sendSSEMessage(controller, sseMessage);
   }
 
-  sendToolResponse(controller: ReadableStreamDefaultController, id: string | number, result: any): void {
+  sendToolResponse(controller: ReadableStreamDefaultController, id: string | number, result: unknown): void {
     this.sendMCPMessage(controller, {
       jsonrpc: '2.0',
       id,
@@ -219,7 +218,7 @@ export class MCPSSEHandler {
     });
   }
 
-  sendError(controller: ReadableStreamDefaultController, id: string | number, error: any): void {
+  sendError(controller: ReadableStreamDefaultController, id: string | number, error: Error | { message: string }): void {
     this.sendMCPMessage(controller, {
       jsonrpc: '2.0',
       id,

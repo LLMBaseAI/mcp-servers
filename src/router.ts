@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
-import type { BaseEnv, MCPServerInfo } from '@llmbase/mcp-shared';
-import { WebFetcherMCPServer } from '../servers/web-fetch/src/index.js';
-import { SSEService, MCPSSEHandler } from '@llmbase/mcp-core/sse';
+import type { Env, MCPServerInfo } from './types';
+import { WebFetcherMCPServer } from './servers/web-fetcher-server';
+import { SSEService, MCPSSEHandler } from './services/sse-service';
 
 // Available MCP servers registry
 const AVAILABLE_SERVERS = {
@@ -22,7 +22,7 @@ const AVAILABLE_SERVERS = {
 } as const;
 
 export function createRouter() {
-  const app = new Hono<{ Bindings: BaseEnv }>();
+  const app = new Hono<{ Bindings: Env }>();
 
   // Enable CORS for all routes
   app.use('/*', async (c, next) => {

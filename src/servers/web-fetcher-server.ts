@@ -1,5 +1,5 @@
 import { WorkerEntrypoint } from 'cloudflare:workers';
-import type { Env, WebFetchOptions } from '../types';
+import type { Env, WebFetchOptions, WebFetchResult } from '../types';
 import { WebFetcher } from '../services/web-fetcher';
 
 export class WebFetcherMCPServer extends WorkerEntrypoint<Env> {
@@ -117,7 +117,7 @@ export class WebFetcherMCPServer extends WorkerEntrypoint<Env> {
           finalUrl: result.finalUrl,
           contentType: result.contentType,
           statusCode: result.statusCode,
-          error: (result as any).error || null
+          error: (result as WebFetchResult & { error?: string }).error || null
         })),
         summary: {
           totalRequested: urls.length,

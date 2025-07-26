@@ -5,14 +5,13 @@
       "name": "@llmbase/mcp-servers",
       "dependencies": {
         "@cloudflare/workers-types": "^4.20241218.0",
-        "@llmbase/mcp-core": "workspace:*",
-        "@llmbase/mcp-shared": "workspace:*",
-        "@llmbase/mcp-web-fetch": "workspace:*",
         "hono": "^4.6.11",
+        "turndown": "^7.2.0",
         "workers-mcp": "^0.0.13",
       },
       "devDependencies": {
         "@modelcontextprotocol/sdk": "^1.16.0",
+        "@types/turndown": "^5.0.5",
         "@typescript-eslint/eslint-plugin": "^8.18.2",
         "@typescript-eslint/parser": "^8.18.2",
         "eslint": "^9.17.0",

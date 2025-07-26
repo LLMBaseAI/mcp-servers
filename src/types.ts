@@ -4,6 +4,21 @@ export interface Env {
   FILES?: R2Bucket;
 }
 
+// Inline types from @llmbase/mcp-shared for standalone npm package
+export interface MCPServerInfo {
+  name: string;
+  description: string;
+  version: string;
+  tools: string[];
+  author?: {
+    name: string;
+    url?: string;
+    email?: string;
+  };
+  repository?: string;
+  homepage?: string;
+}
+
 export interface WebFetchOptions {
   url: string;
   format?: 'raw' | 'markdown' | 'text';
