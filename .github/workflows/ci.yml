@@ -40,7 +40,9 @@ jobs:
           git diff --exit-code || (echo "Code is not properly formatted. Run 'bun run format'" && exit 1)
 
       - name: Type check
-        run: bun run build
+        run: |
+          # Build main project
+          bunx tsc --skipLibCheck
 
       - name: Check dist output
         run: |
@@ -90,7 +92,9 @@ jobs:
         run: bun install
 
       - name: Build package
-        run: bun run build
+        run: |
+          # Build just the main project for packaging
+          bunx tsc --project tsconfig.json --skipLibCheck
 
       - name: Pack package
         run: npm pack

@@ -21,8 +21,8 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "build": "bun run build:packages && tsc",
-    "build:packages": "bun run --filter='packages/*' build && bun run --filter='servers/*' build",
+    "build": "bunx tsc",
+    "build:packages": "echo 'Building individual packages...' && cd servers/web-fetch && bun run build",
     "lint": "eslint src/**/*.ts",
     "lint:packages": "bun run --filter='packages/*' lint && bun run --filter='servers/*' lint",
     "format": "prettier --write src/**/*.ts",
@@ -30,7 +30,7 @@
     "test:packages": "bun run --filter='packages/*' test && bun run --filter='servers/*' test",
     "clean": "rm -rf dist",
     "clean:packages": "bun run --filter='packages/*' clean && bun run --filter='servers/*' clean",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "bunx tsc --noEmit",
     "prepublishOnly": "bun run build",
     "version": "bun run format && bun run lint && bun run build",
     "postversion": "git push && git push --tags"

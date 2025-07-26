@@ -30,13 +30,10 @@ jobs:
 
       - name: Build packages
         run: |
-          # Build individual packages first
-          cd servers/web-fetch && bun run build && cd ../..
-          cd packages/core && bun run build && cd ../..
-          cd packages/shared && bun run build && cd ../..
-          
-          # Build main project
-          bun run build || npx tsc --build --force
+          echo "JSR publishes TypeScript source directly, skipping build step"
 
       - name: Publish to JSR
-        run: npx jsr publish
+        run: |
+          # Use standalone config for JSR that doesn't depend on workspace packages
+          cp jsr-standalone.json jsr.json
+          bunx jsr publish
